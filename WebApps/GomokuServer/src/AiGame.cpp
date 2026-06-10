@@ -14,7 +14,15 @@ AiGame::AiGame(int userId)
 	srand(time(0)); // 初始化随机数种子
 }
 
-// 处理人类玩家移动
+/**
+ * @brief 处理人类玩家的落子操作。
+ * 
+ * 验证移动的有效性，更新棋盘状态，并检查是否有人类玩家获胜。
+ * 
+ * @param x 落子的行坐标。
+ * @param y 落子的列坐标。
+ * @return 如果移动有效并成功执行则返回 true，否则返回 false。
+ */
 bool AiGame::humanMove(int x, int y) 
 {
     if (!isValidMove(x, y)) 
@@ -32,7 +40,11 @@ bool AiGame::humanMove(int x, int y)
     return true;
 }
 
- // AI移动
+ /**
+ * @brief 执行人工智能玩家的移动逻辑。
+ * 
+ * 该函数内部包含AI决策算法，计算最佳落子位置并执行移动。
+ */
 void AiGame::aiMove() 
 {
     if (gameOver_ || isDraw()) return;
@@ -53,7 +65,17 @@ void AiGame::aiMove()
 }
 
 
-// 辅助函数：评估某个位置的威胁程度
+/**
+ * @brief 评估指定位置的威胁程度
+ * 
+ * 通过检查四个主要方向（垂直、水平、两条对角线）上连续的人类棋子数量，
+ * 计算给定坐标点的潜在威胁值。威胁值越高，表示该位置附近人类玩家的连子越多，
+ * AI越需要关注此位置进行防守或拦截。
+ * 
+ * @param r 行索引，表示要评估的棋盘行位置
+ * @param c 列索引，表示要评估的棋盘列位置
+ * @return int 威胁分数，值为各方向上探测到的人类棋子总数（包含起始点本身）
+ */
 int AiGame::evaluateThreat(int r, int c) 
 {
     int threat = 0;
@@ -76,7 +98,13 @@ int AiGame::evaluateThreat(int r, int c)
     return threat;
 }
 
-// 辅助函数：判断某个空位是否靠近已有棋子
+/**
+ * @brief 判断某个空位是否靠近已有棋子。
+ * 
+ * @param r 行坐标。
+ * @param c 列坐标。
+ * @return bool 如果靠近已有棋子返回 true，否则返回 false。
+ */
 bool AiGame::isNearOccupied(int r, int c) 
 {
     const int directions[8][2] = {
@@ -93,7 +121,18 @@ bool AiGame::isNearOccupied(int r, int c)
     return false;
 }
 
-// 检查胜利条件
+/**
+ * @brief 检查指定位置落子后，该玩家是否获胜（五子连珠）
+ * 
+ * 通过检查水平、垂直、主对角线和副对角线四个方向，
+ * 统计连续相同棋子的数量，判断是否达到5个及以上。
+ * 
+ * @param x 当前落子的横坐标
+ * @param y 当前落子的纵坐标
+ * @param player 当前玩家标识字符串
+ * @return true 如果当前玩家获胜
+ * @return false 如果当前玩家未获胜
+ */
 bool AiGame::checkWin(int x, int y, const std::string& player) 
 {
     // 检查方向数组：水平、垂直、对角线、反对角线
@@ -127,7 +166,18 @@ bool AiGame::checkWin(int x, int y, const std::string& player)
     return false;
 }
 
-
+/**
+ * @brief 获取AI的最佳落子位置。
+ * 
+ * 该函数通过多层策略决定AI的下一步行动，优先级如下：
+ * 1. 检查是否存在立即获胜的机会，若有则直接落子。
+ * 2. 检查玩家是否存在立即获胜的威胁，若有则进行拦截防守。
+ * 3. 若无紧急胜负情况，评估所有空位的威胁程度，选择威胁值最高的位置。
+ * 4. 若无法评估出有效威胁点，优先选择靠近已有棋子的空位以维持局势关联。
+ * 5. 作为兜底策略，选择棋盘上第一个可用的空位。
+ * 
+ * @return std::pair<int, int> 返回最佳落子的行号和列号组成的 pair。
+ */
 std::pair<int, int> AiGame::getBestMove()
 {
     std::pair<int, int> bestMove = {-1, -1}; // 最佳落子位置
