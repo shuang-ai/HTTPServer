@@ -42,6 +42,12 @@ DbConnectionPool::DbConnectionPool()
     checkThread_.detach();
 }
 
+/**
+ * @brief 数据库连接池析构函数
+ * 
+ * 负责清理连接池中剩余的所有数据库连接，并释放相关资源。
+ * 在对象生命周期结束时自动调用，确保无资源泄漏。
+ */
 DbConnectionPool::~DbConnectionPool() 
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -52,7 +58,19 @@ DbConnectionPool::~DbConnectionPool()
     LOG_INFO << "Database connection pool destroyed";
 }
 
-// 修改获取连接的函数
+/**
+ * @brief 从数据库连接池中获取一个可用的数据库连接。
+ * 
+ * 该函数会尝试从内部队列中取出一个空闲连接。如果当前没有可用连接，
+ * 调用线程将被阻塞直到有连接被释放回池中或发生异常。
+ * 获取到的连接在 shared_ptr 销毁时会自动归还到连接池中。
+ * 
+ * @return std::shared_ptr<DbConnection> 指向可用数据库连接的智能指针。
+ *         当该智能指针引用计数归零时，连接将自动返回池中。
+ * 
+ * @throws DbException 如果连接池尚未初始化。
+ * @throws std::exception 如果在获取或验证连接过程中发生错误。
+ */
 std::shared_ptr<DbConnection> DbConnectionPool::getConnection() 
 {
     std::shared_ptr<DbConnection> conn;
@@ -82,6 +100,7 @@ std::shared_ptr<DbConnection> DbConnectionPool::getConnection()
             conn->reconnect();
         }
         
+        // 第二个参数是自定义的删除器，当 shared_ptr 被销毁时会调用该函数将连接返回池中
         return std::shared_ptr<DbConnection>(conn.get(), 
             [this, conn](DbConnection*) {
                 std::lock_guard<std::mutex> lock(mutex_);
@@ -106,7 +125,17 @@ std::shared_ptr<DbConnection> DbConnectionPool::createConnection()
     return std::make_shared<DbConnection>(host_, user_, password_, database_);
 }
 
-// 修改检查连接的函数
+/**
+ * @brief 定期检查并维护数据库连接池中的连接状态。
+ * 
+ * 该函数在一个无限循环中运行，主要执行以下任务：
+ * 1. 获取当前连接池中的所有连接快照。
+ * 2. 在锁外对每个连接进行心跳检测（ping）。
+ * 3. 如果连接失效，尝试重新连接。
+ * 4. 每次检查间隔60秒，若发生异常则短暂休眠后重试。
+ * 
+ * @note 此函数通常作为后台守护线程运行，无参数输入，无返回值。
+ */
 void DbConnectionPool::checkConnections() 
 {
     while (true) 

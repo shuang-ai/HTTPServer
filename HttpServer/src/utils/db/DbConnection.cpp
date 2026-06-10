@@ -7,6 +7,20 @@ namespace http
 namespace db 
 {
 
+/**
+ * @brief 构造数据库连接对象并建立与MySQL服务器的连接。
+ *
+ * 该构造函数使用提供的连接参数初始化成员变量，并尝试建立实际的数据库连接。
+ * 连接成功后，会配置重连策略、超时时间、禁用多语句执行，并将字符集设置为 utf8mb4。
+ * 如果连接失败或配置过程中发生异常，将抛出 DbException。
+ *
+ * @param host     数据库服务器的主机地址（例如 "localhost" 或 IP 地址）。
+ * @param user     用于认证的用户名。
+ * @param password 用于认证的密码。
+ * @param database 要连接的默认数据库名称。
+ *
+ * @throws DbException 当数据库连接失败、设置 schema 失败或执行初始化 SQL 语句失败时抛出。
+ */
 DbConnection::DbConnection(const std::string& host,
                          const std::string& user,
                          const std::string& password,
@@ -56,6 +70,15 @@ DbConnection::~DbConnection()
     LOG_INFO << "Database connection closed";
 }
 
+/**
+ * @brief 检查数据库连接是否有效。
+ * 
+ * 通过执行一个简单的查询（SELECT 1）来验证当前数据库连接的可用性。
+ * 该操作会创建一个新的语句对象，避免复用可能处于无效状态的缓存语句。
+ * 
+ * @return true 如果连接有效且查询成功执行。
+ * @return false 如果发生 SQL 异常，表明连接已断开或不可用。
+ */
 bool DbConnection::ping() 
 {
     try 
@@ -126,6 +149,16 @@ void DbConnection::reconnect()
     }
 }
 
+/**
+ * @brief 清理数据库连接资源，确保连接处于干净且可用的状态。
+ * 
+ * 该函数执行以下操作：
+ * 1. 回滚任何未提交的事务并恢复自动提交模式。
+ * 2. 消耗并清理所有未处理的结果集，防止资源泄漏。
+ * 3. 如果清理过程中发生异常，尝试重新连接数据库以恢复连接可用性。
+ * 
+ * @note 此函数是线程安全的，通过互斥锁保护内部状态。
+ */
 void DbConnection::cleanup() 
 {
     std::lock_guard<std::mutex> lock(mutex_);
