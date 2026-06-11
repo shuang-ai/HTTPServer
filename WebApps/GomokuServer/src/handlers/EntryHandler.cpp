@@ -16,9 +16,14 @@ void EntryHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp
     fileOperater.readFile(buffer); // 读出文件数据
     std::string bufStr = std::string(buffer.data(), buffer.size());
     
+    // 设置HTTP响应的状态行信息。
     resp->setStatusLine(req.getVersion(), http::HttpResponse::k200Ok, "OK");
+     // 设置连接保持活跃，不关闭连接（Keep-Alive）
     resp->setCloseConnection(false);
+     // 设置响应内容类型为 HTML 文本
     resp->setContentType("text/html");
+    // 设置响应体内容的长度
     resp->setContentLength(bufStr.size());
+    // 设置响应体内容
     resp->setBody(bufStr);
 }

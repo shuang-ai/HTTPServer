@@ -18,6 +18,19 @@ void Router::registerCallback(HttpRequest::Method method, const std::string &pat
     callbacks_[key] = std::move(callback);
 }
 
+/**
+ * @brief 根据HTTP请求的方法和路径路由到相应的处理器或回调函数。
+ *
+ * 该函数按照以下优先级顺序查找匹配的处理逻辑：
+ * 1. 静态路由处理器 (handlers_)
+ * 2. 静态路由回调函数 (callbacks_)
+ * 3. 动态路由处理器 (regexHandlers_)，支持路径参数提取
+ * 4. 动态路由回调函数 (regexCallbacks_)，支持路径参数提取
+ *
+ * @param req HTTP请求对象，包含方法、路径等信息。
+ * @param resp HTTP响应对象指针，用于填充响应数据。
+ * @return bool 如果找到匹配的路由并成功处理则返回 true，否则返回 false。
+ */
 bool Router::route(const HttpRequest &req, HttpResponse *resp)
 {
     RouteKey key{req.method(), req.path()};
