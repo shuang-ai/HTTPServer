@@ -33,9 +33,10 @@ void Router::registerCallback(HttpRequest::Method method, const std::string &pat
  */
 bool Router::route(const HttpRequest &req, HttpResponse *resp)
 {
+    // 存放这次请求的http方法和路径
     RouteKey key{req.method(), req.path()};
 
-    // 查找处理器
+    // 查找处理器，用来查找精准匹配的路由处理器
     auto handlerIt = handlers_.find(key);
     if (handlerIt != handlers_.end())
     {

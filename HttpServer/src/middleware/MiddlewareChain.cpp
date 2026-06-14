@@ -11,7 +11,14 @@ void MiddlewareChain::addMiddleware(std::shared_ptr<Middleware> middleware)
     middlewares_.push_back(middleware);
 }
 
-
+/**
+ * @brief 执行所有中间件的前置处理逻辑
+ * 
+ * 遍历注册的中间件列表，依次调用每个中间件的 before 方法，
+ * 以便在请求正式处理前进行预处理操作（如权限验证、日志记录等）。
+ * 
+ * @param request HTTP请求对象的引用，将在各个中间件中被修改或检查
+ */
 void MiddlewareChain::processBefore(HttpRequest &request)
 {
     // 遍历中间件列表并执行前置处理

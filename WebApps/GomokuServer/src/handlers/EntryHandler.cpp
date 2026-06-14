@@ -5,6 +5,7 @@ void EntryHandler::handle(const http::HttpRequest& req, http::HttpResponse* resp
     // 因为是get请求，请求的url也拿到了，我们就可以直接返回响应了
     std::string reqFile;
     reqFile.append("../WebApps/GomokuServer/resource/entry.html");
+    // 用二进制形式读取文件内容
     FileUtil fileOperater(reqFile);
     if (!fileOperater.isValid())
     {

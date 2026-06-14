@@ -69,6 +69,7 @@ public:
      */
     void readFile(std::vector<char>& buffer)
     {
+        // 这个buffer.data()表示第一个元素的指针
         if (file_.read(buffer.data(), size()))
         {
             LOG_INFO << "File content load into memory (" << size() << " bytes)";
