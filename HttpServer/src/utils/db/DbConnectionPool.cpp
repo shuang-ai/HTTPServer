@@ -120,6 +120,14 @@ std::shared_ptr<DbConnection> DbConnectionPool::getConnection()
     }
 }
 
+/**
+ * @brief 创建一个新的数据库连接对象。
+ *
+ * 该函数使用当前连接池配置的 host、user、password 和 database 参数，
+ * 构造并返回一个共享指针管理的 DbConnection 实例。
+ *
+ * @return std::shared_ptr<DbConnection> 指向新创建的数据库连接对象的共享指针。
+ */
 std::shared_ptr<DbConnection> DbConnectionPool::createConnection() 
 {
     return std::make_shared<DbConnection>(host_, user_, password_, database_);

@@ -1,5 +1,14 @@
 #include "../include/handlers/LoginHandler.h"
 
+/**
+ * @brief 处理用户登录请求。
+ * 
+ * 该函数负责解析HTTP请求中的JSON数据，验证用户名和密码，
+ * 管理用户会话状态以及在线用户统计。
+ * 
+ * @param req HTTP请求对象，包含请求头、Body等信息。
+ * @param resp HTTP响应对象指针，用于设置响应状态、 headers 和 Body。
+ */
 void LoginHandler::handle(const http::HttpRequest &req, http::HttpResponse *resp)
 {
     // 处理登录逻辑
