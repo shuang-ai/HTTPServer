@@ -13,13 +13,22 @@ namespace ssl
 using MessageCallback = std::function<void(const std::shared_ptr<muduo::net::TcpConnection>&,
                                          muduo::net::Buffer*,
                                          muduo::Timestamp)>;
-
+/**
+ * @brief SSL 连接封装类，基于 Muduo 网络库和 OpenSSL 实现 TLS/SSL 协议处理。
+ *        该类负责管理 SSL 握手过程、数据加密发送以及解密接收，并通过 BIO 机制
+ *        将 SSL 层与底层的 TCP 连接解耦。
+ */                                         
 class SslConnection : muduo::noncopyable 
 {
 public:
     using TcpConnectionPtr = std::shared_ptr<muduo::net::TcpConnection>;
     using BufferPtr = muduo::net::Buffer*;
     
+    /**
+     * @brief 构造 SSL 连接对象。
+     * @param conn 底层的 TCP 连接共享指针。
+     * @param ctx SSL 上下文对象指针，用于获取 SSL_CTX 配置。
+     */
     SslConnection(const TcpConnectionPtr& conn, SslContext* ctx);
     ~SslConnection();
 

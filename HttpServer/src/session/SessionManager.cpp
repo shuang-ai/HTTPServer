@@ -14,18 +14,35 @@ SessionManager::SessionManager(std::unique_ptr<SessionStorage> storage)
     , rng_(std::random_device{}()) // 初始化随机数生成器，用于生成随机的会话ID
 {}
 
-// 从请求中获取或创建会话，也就是说，如果请求中包含会话ID，则从存储中加载会话，否则创建一个新的会话
+/**
+ * @brief 获取或创建会话对象
+ * 
+ * 该函数尝试从请求的Cookie中提取会话ID并加载对应的会话。
+ * 如果会话不存在、已过期或Cookie中未包含有效的会话ID，则创建一个新的会话，
+ * 并将新的会话ID设置到响应Cookie中。对于现有的有效会话，会更新其管理器引用并刷新状态。
+ * 最后，将会话数据持久化存储并返回会话对象。
+ *
+ * @param req HTTP请求对象，用于从中提取Cookie以获取会话ID
+ * @param resp HTTP响应对象指针，用于在创建新会话时设置Set-Cookie头
+ * @return std::shared_ptr<Session> 返回有效的会话对象共享指针，可能是新创建的或从存储中加载的
+ */
 std::shared_ptr<Session> SessionManager::getSession(const HttpRequest& req, HttpResponse* resp)
 {   
+    // 从 HTTP 请求的 Cookie 头中提取 sessionId 字符串
+    // 如果 Cookie 中没有 sessionId，则返回空字符串
     std::string sessionId = getSessionIdFromCookie(req);
     
     std::shared_ptr<Session> session;
 
+    // 如果请求中包含会话ID，则尝试加载会话
     if (!sessionId.empty())
     {
         session = storage_->load(sessionId);
     }
 
+    // 4. 判断会话是否有效：
+    // 条件 A: session 为空指针（说明 Cookie 里的 ID 无效或存储中不存在）
+    // 条件 B: session 存在但已过期（isExpired() 返回 true）
     if (!session || session->isExpired())
     {
         sessionId = generateSessionId();
@@ -34,11 +51,16 @@ std::shared_ptr<Session> SessionManager::getSession(const HttpRequest& req, Http
     }
     else 
     {
+        // 如果会话有效且未过期，更新会话的管理器引用
+        // 这通常用于确保 Session 对象持有正确的 Manager 指针（可能在反序列化后丢失）
         session->setManager(this); // 为现有会话设置管理器
     }
 
+    // 防止活跃用户因为长时间操作而被判定为过期
     session->refresh();
+    // 将会话状态持久化保存
     storage_->save(session);  // 这里可能有问题，需要确保正确保存会话
+    // 返回有效的会话对象给调用者
     return session;
 }
 

@@ -6,7 +6,13 @@ namespace http
 {
 namespace session
 {
-
+/**
+ * @brief 构造一个新的会话对象。
+ *
+ * @param sessionId 会话的唯一标识符。
+ * @param sessionManager 管理该会话的会话管理器指针。
+ * @param maxAge 会话的最大存活时间（秒）。
+ */
 Session::Session(const std::string& sessionId, SessionManager* sessionManager, int maxAge)
     : sessionId_(sessionId)
     , maxAge_(maxAge)
@@ -21,7 +27,12 @@ bool Session::isExpired() const
     return std::chrono::system_clock::now() > expiryTime_;
 }
 
-// 刷新会话的过期时间
+/**
+ * @brief 刷新会话的过期时间。
+ *
+ * 该函数将会话的过期时间更新为当前系统时间加上最大存活时间（maxAge_）。
+ * 通常用于在用户活动后延长会话的有效期限。
+ */
 void Session::refresh()
 {
     expiryTime_ = std::chrono::system_clock::now() + std::chrono::seconds(maxAge_);

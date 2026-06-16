@@ -260,7 +260,7 @@ void HttpServer::handleRequest(const HttpRequest &req, HttpResponse *resp)
         HttpRequest mutableReq = req;
         middlewareChain_.processBefore(mutableReq);
 
-        // 路由处理
+        // 路由处理，true表示执行成功
         if (!router_.route(mutableReq, resp))
         {
             LOG_INFO << "请求的啥，url：" << req.method() << " " << req.path();

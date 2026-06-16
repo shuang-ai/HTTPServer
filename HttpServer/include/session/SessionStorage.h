@@ -7,6 +7,12 @@ namespace http
 namespace session
 {
 
+/**
+ * @brief 会话存储接口，定义了会话数据的持久化操作规范。
+ *
+ * 该抽象类提供了保存、加载和删除会话的基本接口，
+ * 允许通过不同的后端实现（如内存、数据库等）来存储会话数据。
+ */
 class SessionStorage
 {
 public:

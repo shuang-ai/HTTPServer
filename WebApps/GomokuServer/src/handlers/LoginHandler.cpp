@@ -45,6 +45,7 @@ void LoginHandler::handle(const http::HttpRequest &req, http::HttpResponse *resp
             session->setValue("userId", std::to_string(userId));
             session->setValue("username", username);
             session->setValue("isLoggedIn", "true");
+            // 查看这个用户是否在线
             if (server_->onlineUsers_.find(userId) == server_->onlineUsers_.end() || server_->onlineUsers_[userId] == false)
             {
                 {
@@ -61,6 +62,7 @@ void LoginHandler::handle(const http::HttpRequest &req, http::HttpResponse *resp
                 successResp["userId"] = userId;
                 std::string successBody = successResp.dump(4);
 
+                // 填充http响应
                 resp->setStatusLine(req.getVersion(), http::HttpResponse::k200Ok, "OK");
                 resp->setCloseConnection(false);
                 resp->setContentType("application/json");
@@ -109,6 +111,7 @@ void LoginHandler::handle(const http::HttpRequest &req, http::HttpResponse *resp
         failureResp["message"] = e.what();
         std::string failureBody = failureResp.dump(4);
 
+        // 填充http响应
         resp->setStatusLine(req.getVersion(), http::HttpResponse::k400BadRequest, "Bad Request");
         resp->setCloseConnection(true);
         resp->setContentType("application/json");

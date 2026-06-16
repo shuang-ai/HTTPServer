@@ -57,3 +57,5 @@ vcpkg_installed/
 # 如果你使用 clangd
 .clangd/
 .clangd
+
+/HttpServer/certs
