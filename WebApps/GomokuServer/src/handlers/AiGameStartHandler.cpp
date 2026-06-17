@@ -2,21 +2,7 @@
 
 void AiGameStartHandler::handle(const http::HttpRequest &req, http::HttpResponse *resp)
 {
-    auto session = server_->getSessionManager()->getSession(req, resp);
-    if (session->getValue("isLoggedIn") != "true")
-    {
-        // 用户未登录，返回未授权错误
-        json errorResp;
-        errorResp["status"] = "error";
-        errorResp["message"] = "Unauthorized";
-        std::string errorBody = errorResp.dump(4);
-
-        server_->packageResp(req.getVersion(), http::HttpResponse::k401Unauthorized,
-                             "Unauthorized", true, "application/json", errorBody.size(),
-                             errorBody, resp);
-        return;
-    }
-
+    auto session = req.getSession();
     int userId = std::stoi(session->getValue("userId"));
 
     // 看来需要menu页面post发送userId

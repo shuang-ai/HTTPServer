@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
@@ -8,6 +9,11 @@
 
 namespace http
 {
+
+namespace session
+{
+class Session;
+}
 
 class HttpRequest
 {
@@ -86,6 +92,15 @@ public:
     uint64_t contentLength() const
     { return contentLength_; }
 
+    void setSession(std::shared_ptr<session::Session> session)
+    { session_ = std::move(session); }
+
+    std::shared_ptr<session::Session> getSession() const
+    { return session_; }
+
+    bool hasSession() const
+    { return static_cast<bool>(session_); }
+
     // 交换当前 HttpRequest 对象与另一个 HttpRequest 对象的内容。
     void swap(HttpRequest& that);
 
@@ -99,6 +114,7 @@ private:
     std::map<std::string, std::string>           headers_; // 请求头
     std::string                                  content_; // 请求体
     uint64_t                                     contentLength_ { 0 }; // 请求体长度
-};  
+    std::shared_ptr<session::Session>            session_;
+};
 
 } // namespace http

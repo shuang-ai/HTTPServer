@@ -5,24 +5,9 @@ void MenuHandler::handle(const http::HttpRequest &req, http::HttpResponse *resp)
     // JSON 解析使用 try catch 捕获异常
     try
     {
-        // 检查用户是否已登录
-        auto session = server_->getSessionManager()->getSession(req, resp);
+        auto session = req.getSession();
         LOG_INFO << "session->getValue(\"isLoggedIn\") = " << session->getValue("isLoggedIn");
-        if (session->getValue("isLoggedIn") != "true")
-        {
-            // 用户未登录，返回未授权错误
-            json errorResp;
-            errorResp["status"] = "error";
-            errorResp["message"] = "Unauthorized";
-            std::string errorBody = errorResp.dump(4);
 
-            server_->packageResp(req.getVersion(), http::HttpResponse::k401Unauthorized,
-                                "Unauthorized", true, "application/json", errorBody.size(),
-                                 errorBody, resp);
-            return;
-        }
-
-        // 获取用户信息
         int userId = std::stoi(session->getValue("userId"));
         std::string username = session->getValue("username");
 

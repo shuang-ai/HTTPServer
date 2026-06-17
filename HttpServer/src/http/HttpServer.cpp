@@ -258,7 +258,7 @@ void HttpServer::handleRequest(const HttpRequest &req, HttpResponse *resp)
     {
         // 处理请求前的中间件
         HttpRequest mutableReq = req;
-        middlewareChain_.processBefore(mutableReq);
+        middlewareChain_.processBefore(mutableReq, resp);
 
         // 路由处理，true表示执行成功
         if (!router_.route(mutableReq, resp))

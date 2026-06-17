@@ -36,7 +36,7 @@ public:
      * @param request 引用类型的HttpRequest对象，表示当前 incoming 的HTTP请求，
      *                可在此阶段对其进行读取或修改。
      */
-    void before(HttpRequest& request) override;
+    void before(HttpRequest& request, HttpResponse* response) override;
     
     /**
      * @brief 在HTTP响应生成之后执行的后处理逻辑。

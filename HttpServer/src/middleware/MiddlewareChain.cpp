@@ -19,12 +19,11 @@ void MiddlewareChain::addMiddleware(std::shared_ptr<Middleware> middleware)
  * 
  * @param request HTTP请求对象的引用，将在各个中间件中被修改或检查
  */
-void MiddlewareChain::processBefore(HttpRequest &request)
+void MiddlewareChain::processBefore(HttpRequest &request, HttpResponse* response)
 {
-    // 遍历中间件列表并执行前置处理
     for (auto &middleware : middlewares_)
     {
-        middleware->before(request);
+        middleware->before(request, response);
     }
 }
 

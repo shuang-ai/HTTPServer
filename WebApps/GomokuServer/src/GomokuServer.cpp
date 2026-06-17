@@ -10,6 +10,7 @@
 #include "../../../HttpServer/include/http/HttpRequest.h"
 #include "../../../HttpServer/include/http/HttpResponse.h"
 #include "../../../HttpServer/include/http/HttpServer.h"
+#include "../../../HttpServer/include/middleware/session/SessionMiddleware.h"
 
 using namespace http;
 
@@ -55,10 +56,22 @@ void GomokuServer::initializeSession()
 
 void GomokuServer::initializeMiddleware()
 {
-    // 创建中间件
     auto corsMiddleware = std::make_shared<http::middleware::CorsMiddleware>();
-    // 添加中间件
     httpServer_.addMiddleware(corsMiddleware);
+
+    http::middleware::SessionConfig sessionConfig;
+    sessionConfig.enableAuthGuard = true;
+    sessionConfig.publicPaths = {
+        "/",
+        "/entry",
+        "/login",
+        "/register",
+        "/backend",
+        "/backend_data"
+    };
+    auto sessionMiddleware = std::make_shared<http::middleware::SessionMiddleware>(
+        getSessionManager(), sessionConfig);
+    httpServer_.addMiddleware(sessionMiddleware);
 }
 
 void GomokuServer::initializeRouter()
@@ -95,22 +108,7 @@ void GomokuServer::initializeRouter()
 
 void GomokuServer::restartChessGameVsAi(const http::HttpRequest &req, http::HttpResponse *resp)
 {
-    // 解析请求体
-    auto session = getSessionManager()->getSession(req, resp);
-    if (session->getValue("isLoggedIn") != "true")
-    {
-        // 用户未登录，返回未授权错误
-        json errorResp;
-        errorResp["status"] = "error";
-        errorResp["message"] = "Unauthorized";
-        std::string errorBody = errorResp.dump(4);
-
-        packageResp(req.getVersion(), http::HttpResponse::k401Unauthorized,
-                    "Unauthorized", true, "application/json", errorBody.size(),
-                    errorBody, resp);
-        return;
-    }
-
+    auto session = req.getSession();
     int userId = std::stoi(session->getValue("userId"));
     {
         // 重新开始ai对战

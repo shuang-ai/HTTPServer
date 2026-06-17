@@ -27,7 +27,7 @@ public:
  *
  * @param request HTTP 请求对象的引用，中间件可对其进行修改或检查。
  */
-    void processBefore(HttpRequest& request);
+    void processBefore(HttpRequest& request, HttpResponse* response);
 
 /**
  * @brief 按顺序执行所有中间件的响应后处理逻辑。

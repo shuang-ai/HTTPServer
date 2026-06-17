@@ -16,9 +16,7 @@ void LogoutHandler::handle(const http::HttpRequest &req, http::HttpResponse *res
     // JSON 解析使用 try catch 捕获异常
     try
     {
-        // 获取会话
-        auto session = server_->getSessionManager()->getSession(req, resp);
-        // 获取用户id
+        auto session = req.getSession();
         int userId = std::stoi(session->getValue("userId"));
         // 清除会话数据
         session->clear();

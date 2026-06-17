@@ -19,8 +19,8 @@ class Middleware
 public:
     virtual ~Middleware() = default;
     
-    // 请求前处理
-    virtual void before(HttpRequest& request) = 0;
+    // 请求前处理（response 用于需要写 Set-Cookie 等响应头的中间件）
+    virtual void before(HttpRequest& request, HttpResponse* response) = 0;
     
     // 响应后处理
     virtual void after(HttpResponse& response) = 0;

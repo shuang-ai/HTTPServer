@@ -21,7 +21,7 @@ CorsMiddleware::CorsMiddleware(const CorsConfig& config) : config_(config) {}
  * @param request HTTP 请求对象的引用，用于获取请求方法和相关信息。
  * @return void 无返回值。若为预检请求，通过抛出 HttpResponse 对象来终止流程。
  */
-void CorsMiddleware::before(HttpRequest& request) 
+void CorsMiddleware::before(HttpRequest& request, HttpResponse* /*response*/)
 {
     LOG_DEBUG << "CorsMiddleware::before - Processing request";
     

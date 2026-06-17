@@ -1,4 +1,5 @@
 #include "../../include/http/HttpRequest.h"
+#include "../../include/session/Session.h"
 
 namespace http
 {
@@ -210,6 +211,7 @@ void HttpRequest::swap(HttpRequest &that)
     std::swap(version_, that.version_);
     std::swap(headers_, that.headers_);
     std::swap(receiveTime_, that.receiveTime_);
+    std::swap(session_, that.session_);
 }
 
 } // namespace http
