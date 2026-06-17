@@ -8,6 +8,12 @@ namespace http
 namespace middleware 
 {
 
+/**
+ * @brief HTTP 中间件基类
+ * 
+ * 定义了中间件的通用接口，支持在请求处理前和响应处理后执行自定义逻辑。
+ * 支持链式调用，通过设置下一个中间件形成责任链。
+ */
 class Middleware 
 {
 public:
